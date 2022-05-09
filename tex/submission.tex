@@ -30,25 +30,60 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 
 % <SCPD_SUBMISSION_TAG>_1a
 \begin{answer}
-  Since $g'(z) = g(z)(1-g(z))$ and $h(x) = g(\theta^T x)$, it follows that $\partial h(x) / \partial \theta_k = h(x)(1 - h(x)) x_k$.
-
-  Letting $h_{\theta}(x^{(i)}) = g(\theta^T x^{(i)})
-  = 1/(1 + \exp(-\theta^T x^{(i)}))$, we have\\
+  Since \\
+  \begin{center}
+  $g'(z) = g(z)(1-g(z))$ and \\
+  $h(x) = g(\theta^T x)$, 
+  \end{center} 
+  it follows that 
+  \begin{center}
+   $\partial h(x) / \partial \theta_k = h(x)(1 - h(x)) x_k$.
+  \end{center}
+  Letting 
+  \begin{center}
+  $h_{\theta}(x^{(i)}) = g(\theta^T x^{(i)})
+  = 1/(1 + \exp(-\theta^T x^{(i)}))$, 
+  \end{center}
+  we have\\
 
   \begin{flalign*}
-    \frac{\partial\log h_{\theta}(x^{(i)})}{\partial\theta_k} &= \\
+    \frac{\partial\log h_{\theta}(x^{(i)})}{\partial\theta_k} &= 
+    \frac{1}{h(\theta^T x)} \times  h(x)(1 - h(x)) x_k\\
+    &=      (1 - h(x))  x^{(i)}\\
     % ### START CODE HERE ###
     % ### END CODE HERE ###
-    \frac{\partial\log(1 - h_{\theta}(x^{(i)}))}{\partial\theta_k} &= \\
+    \frac{\partial\log(1 - h_{\theta}(x^{(i)}))}{\partial\theta_k} &= 
+    \frac{1}{1 - h(\theta^T x)} \times -1 \times h(x)(1 - h(x)) x_k\\
+    &= - h_{\theta}(x) x^{(i)}
     % ### START CODE HERE ###
     % ### END CODE HERE ###
   \end{flalign*}
 
+recalling that 
+\begin{align*}
+J(\theta) &= \sum_{i=1}^n 
+   y^{(i)} log(h_{\theta} (x^{(i)})) + (1-y^{(i)})log(1 - h_{\theta} (x^{(i)})) 
+\end{align*}
   Substituting into our equation for $J(\theta)$, we have
   %
+      % ### START CODE HERE ###
   \begin{flalign*}
-    \frac{\partial J(\theta)}{\partial\theta_k} &=\\
-    % ### START CODE HERE ###
+    \frac{\partial J(\theta)}{\partial\theta_k} &=
+    \frac{1}{n} 
+    \frac{ \partial \sum_{i=1}^n 
+   y^{(i)} log(h_{\theta} (x^{(i)})) + (1-y^{(i)})log(1 - h_{\theta} (x^{(i)})) }
+          {\partial \theta}\\
+          &=     \frac{1}{n} 
+          \sum_{i=1}^{n} {y^{(i)} (1 - h(x))  x^{(i)}} 
+             + (1-y^{(i)}) \times - h_{\theta}(x) x^{(i)} \\
+    &= \frac{1}{n} 
+          \sum_{i=1}^{n}
+          {y^{(i)} x^{(i)} - h(x) x^{(i)}  }   \\
+    &= \frac{1}{n} 
+          \sum_{i=1}^{n}
+          {x^{(i)} (y^{(i)} - h(x) ) }            
+ %   &=  \frac_{1}^{n} \sum_{i=1}^{n} {1}
+  %  
     % ### END CODE HERE ###
   \end{flalign*}
   
@@ -96,10 +131,43 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
     & = \frac {p(x\vert y=1; \mc{H}) p(y=1; \mc{H})}
       {p(x\vert y=1; \mc{H}) p(y=1; \mc{H}) + p(x\vert y={0}; \mc{H}) p(y={0};
       \mc{H})}\\
-    &=\\
     % ### START CODE HERE ###
+   \end{align*}
+   First note that
+   \begin{align*}
+   \frac{A}{A+B} &= \frac{1}{\frac{B+1}{A}}\\
+   &= \frac{1}{1+\frac{B}{A}}
+   \end{align*}
+   Now letting $A=p(x\vert y=1; \mc{H}) p(y=1; \mc{H})$\\
+   and $B=p(x\vert y=0; \mc{H}) p(y=0; \mc{H})$\\
+   We can continue as
+   \begin{align*}
+        & = \frac {1}
+        {1 + \frac{p(x\vert y=0; \mc{H}) p(y={0}; \mc{H})}
+                  {p(x\vert y=1;   \mc{H}) p(y={1}; \mc{H})}}
+    \end{align*}
+    Noting that $p(y={1}; \mc{H})=\phi $ and  $p(y={0}; \mc{H}) = 1-\phi$
+       \begin{align*}
+        & = \frac {1}
+        {1 + \frac{p(x\vert y=0; \mc{H}) (1-\phi)}
+                  {p(x\vert y=1;   \mc{H}) \phi }}
+    \end{align*}
+    and noting that 
+    \begin{align*}    
+     p(x\vert y=i) &= \frac{1}{(2 \pi)^{\frac{d}{2}} \abs{\Sigma}^{\frac{1}{2}})} exp(-\frac{1}{2} (x- \mu_i)^{T} \Sigma^{-1} (x-\mu_i)) \\
+     \end{align*}
+     the $\frac{1}{(2 \pi)^{\frac{d}{2}}} $ terms will cancel leaving
+     
+   \begin{align*}
+        & = \frac {1}
+        {1 + \frac{exp(-\frac{1}{2} (x- \mu_0)^{T} \Sigma^{-1} (x-\mu_0))  (1-\phi)}
+                  {exp(-\frac{1}{2} (x- \mu_1)^{T} \Sigma^{-1} (x-\mu_1))  \phi }}\\
+  & = \frac {1}
+   {1 + exp(-\frac{1}{2} (x- \mu_0)^{T} \Sigma^{-1} (x-\mu_0))  (1-\phi) + exp(-\frac{1}{2} (x- \mu_1)^{T} \Sigma^{-1} (x-\mu_1))  \phi }
+    \end{align*}
+     
     % ### END CODE HERE ###
-  \end{align*}
+
 \end{answer}
 % <SCPD_SUBMISSION_TAG>_1c
 \clearpage
@@ -111,37 +179,87 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
 % <SCPD_SUBMISSION_TAG>_1d
 \begin{answer}
   First, derive the expression for the log-likelihood of the training data:
-  \begin{flalign*}
+ \begin{flalign}
     \ell(\phi, \mu_{0}, \mu_1, \Sigma) &= \log \prod_{i=1}^\nexp p(x^{(i)} \vert  y^{(i)}; \mu_{0}, \mu_1, \Sigma) p(y^{(i)}; \phi)\\
     &= \sum_{i=1}^{\nexp} \log p(x^{(i)} \vert  y^{(i)}; \mu_{0}, \mu_1, \Sigma) +
     \sum_{i=1}^{n} \log p(y^{(i)}; \phi)\\
-    &=\\
     % ### START CODE HERE ###
+ &=  \sum_{i=1}^{\nexp} \log 
+      \frac{1}{(2 \pi)^{\frac{d}{2}} \abs{\Sigma}^{\frac{1}{2}})}     
+       exp(-\frac{1}{2} (x^{(i)} - 
+        \mu_i)^{T} \Sigma^{-1} (x^{(i)} -\mu_i))  +
+    \sum_{i=1}^{n} \log p(y^{(i)}; \phi)\\
+ &=  \sum_{i=1}^{\nexp} \log 
+      \frac{1}{(2 \pi)^{\frac{d}{2}} \abs{\Sigma}^{\frac{1}{2}})}
+       exp(-\frac{1}{2} (x^{(i)} - \mu_i)^{T} \Sigma^{-1} (x^{(i)}-\mu_i))  +
+    \sum_{i=1}^{n} \log \phi^{y^{(i)}} (1-\phi)^{(1-y^{(i)})}
     % ### END CODE HERE ###
-  \end{flalign*}
+  \end{flalign}
 
   Now, the likelihood is maximized by setting the derivative (or gradient) with respect to each of the parameters to zero.\\
 
-  \textbf{For $\mathbf{\phi}$:}
-
+  \textbf{For $\mathbf{\phi}$:}\\
+Let $n_i$ be the number of $y$ values equal to $i$, for $i \in {0,1}$
   \begin{flalign*}
-    \frac{\partial \ell}{\partial \phi}&=\\
+    \frac{\partial \ell}{\partial \phi}
     % ### START CODE HERE ###
-    % ### END CODE HERE ###
+    &= \frac{n_1 \partial log(\phi)}{\partial \phi} + 
+     \frac{n_0 \partial log(1 - \phi)}{\partial \phi} \\
+    &= \frac{n_1 }{n \phi} - 
+     \frac{n_0}{ n (1 - \phi)}    \\ 
+         &= \frac{n_1 (1-\phi) }{n \phi (1-\phi)} - 
+     \frac{n_0 \phi}{n \phi (1 - \phi)} \\
+&= \frac{n_1 }{n \phi} - 
+     \frac{n_0}{ n (1 - \phi)}    \\ 
+&= \frac{n_1 (1-\phi) - n_0 \phi}{n \phi (1 - \phi)}   
   \end{flalign*}
+  Assuming $\phi$ is not $0$, then this is zero when
+  \begin{align*}
+  n_1 (1-\phi) &=  n_0 \phi \\
+  n_1 - n_1 \phi &= n_0 \phi \\
+  n_1 &= \phi (n_1 + n_0) \\
+  \frac{n_1}{n_1 + n_0} &= \phi \\
+  n_1 = \phi
+  \end{align*}
+    
+    % ### END CODE HERE ###
+
 
   Setting this equal to zero and solving for $\phi$ gives the maximum
-  likelihood estimate.\\
+  likelihood estimate. \\
 
   \textbf{For $\mathbf{\mu_0}$:}
 
   {\bf Hint:}  Remember that $\Sigma$ (and thus $\Sigma^{-1}$) is symmetric.
 
   \begin{flalign*}
-    \nabla_{\mu_{0}}\ell &=\\
+    \nabla_{\mu_{0}}\ell 
     % ### START CODE HERE ###
+    &= \nabla_{\mu_0}  \sum_{i=1}^{\nexp} \log 
+      \frac{1}{(2 \pi)^{\frac{d}{2}} \abs{\Sigma}^{\frac{1}{2}})}
+       exp(-\frac{1}{2} (x^{(i)} - \mu_i)^{T} \Sigma^{-1} (x^{(i)}-\mu_i))  +
+    \sum_{i=1}^{n} \log \phi^{y^{(i)}} (1-\phi)^{(1-y^{(i)})}\\
+ &=  \nabla_{\mu_0}  \sum_{i=1}^{\nexp} \log 
+      \frac{1}{(2 \pi)^{\frac{d}{2}} \abs{\Sigma}^{\frac{1}{2}})}
+       exp(-\frac{1}{2} (x^{(i)} - \mu_i)^{T} \Sigma^{-1} (x^{(i)}-\mu_i)) \\
+ &= {K} \nabla_{\mu_0}  \sum_{i=1}^{\nexp} 
+     -\frac{1}{2} (x^{(i)} - \mu_0)^{T} \Sigma^{-1} (x^{(i)}-\mu_0)) \text{  for the $y^{(i)}=0$ and some constant $K$}     
+       \end{flalign*}
+ Now my matrix calculus is rusty but I know we will get terms that look like
+ \begin{align*}
+ &=  \nabla_{\mu_0}  \sum_{i=1}^{\nexp} \frac{1}{2} x^2 - 2 x^{(i)} \mu_0 + \mu_0^2 \\
+\end{align*}    
+and taking the gradient wrt $\mu_0$ we will get
+\begin{align*}
+ &=    \sum_{i=1}^{\nexp} - x^{(i)} + \mu_0 \text{ for the $y{(i)}=0$}\\
+\end{align*}
+and setting this to 0 will yield something like
+  \begin{align*}
+  \mu_0 &= \frac{\sum {\text{$x^{(i)}$ where $y^{(i)}=0$}}}{n_0}
+  \end{align*}
+  where $n_0$ is the number of $y^{(i)}=0$
     % ### END CODE HERE ###
-  \end{flalign*}
+
 
   Setting this gradient to zero gives the maximum likelihood estimate
   for $\mu_{0}$.\\
@@ -149,12 +267,16 @@ instructions to regenerate this handout with your typeset \LaTeX{} solutions.
   \textbf{For $\mathbf{\mu_1}$:}
 
   {\bf Hint:}  Remember that $\Sigma$ (and thus $\Sigma^{-1}$) is symmetric.
+Similar to above
+    %\nabla_{\mu_{1}}\ell 
 
-  \begin{flalign*}
-    \nabla_{\mu_{1}}\ell &=\\
     % ### START CODE HERE ###
+      \begin{align*}
+  \mu_1 &= \frac{\sum {\text{$x^{(i)}$ where $y^{(i)}=1$}}}{n_1}
+  \end{align*}    
+  where $n_1$ is the number of $y^{(i)}=1$  
     % ### END CODE HERE ###
-  \end{flalign*}
+
 
   Setting this gradient to zero gives the maximum likelihood estimate
   for $\mu_{1}$.\\

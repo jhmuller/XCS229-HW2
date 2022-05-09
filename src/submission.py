@@ -62,6 +62,28 @@ class LogisticRegression:
             y: Training example labels. Shape (n_examples,).
         """
         # *** START CODE HERE ***
+        if self.theta is None:
+            self.theta = np.zeros(x.shape[1])
+        done = False
+        iter = 0
+        printFreq = 2
+        theta_old = self.theta        
+        while not done:
+            p = 1.0/(1+np.exp(-x.dot(theta_old)))
+            W = p*(1-p)
+            score = x.T.dot(y-p)
+            right = np.diag(W).dot(x)
+            D = x.T.dot(right)
+            delta = np.linalg.solve(D, score)
+            theta = theta_old + delta
+            norm = np.linalg.norm(theta - theta_old) 
+            if norm < self.eps:
+                done = True
+            if iter % printFreq == 0:
+                print(f"{iter} {norm} {theta}")                
+            iter += 1
+            theta_old = theta
+        self.theta = theta       
         # *** END CODE HERE ***
 
     def predict(self, x):
@@ -74,6 +96,8 @@ class LogisticRegression:
             Outputs of shape (n_examples,).
         """
         # *** START CODE HERE ***
+        p = 1.0/(1+np.exp(-x.dot(self.theta)))
+        return p
         # *** END CODE HERE ***
 
 def main_GDA(train_path, valid_path, save_path):
@@ -136,6 +160,21 @@ class GDA:
             y: Training example labels. Shape (n_examples,).
         """
         # *** START CODE HERE ***
+        phi = np.sum(y)/y.shape[0]
+        mu_0 = np.mean(x[y == 0], axis=0)
+        mu_1 = np.mean(x[y == 1], axis=0)
+        sigma = np.cov(x.T)
+        self.phi = phi
+        self.mu_0 = mu_0
+        self.mu_1 = mu_1
+        self.sigma = sigma
+        self.theta_0 = 1
+        self.theta_1_1 = np.log(phi/(1-phi))
+        self.theta_1_2 =  - .5*(mu_0 + mu_1).T.dot(np.linalg.inv(sigma)).dot(mu_0 - mu_1)
+        self.theta_1 = self.theta_1_1 + self.theta_1_2
+        self.theta_2 = np.linalg.inv(sigma).dot(mu_0 - mu_1)
+        self.theta = np.array([self.theta_0, self.theta_1, self.theta_2])
+        pass
         # *** END CODE HERE ***
 
     def predict(self, x):
@@ -148,6 +187,11 @@ class GDA:
             Outputs of shape (n_examples,).
         """
         # *** START CODE HERE ***
+        res = x.dot(self.theta[2:]) + self.theta[1] + self.theta[0]
+        if res > 0.5:
+            return 0
+        else:
+            return 1
         # *** END CODE HERE
 
 def main_posonly(train_path, valid_path, test_path, save_path):
@@ -202,6 +246,22 @@ def fully_observed_predictions(train_path, test_path, output_path_true, plot_pat
     # Problem (2a): Train and test on true labels (t)
     # Make sure to save predicted probabilities to output_path_true using np.savetxt()
     # *** START CODE HERE ***
+    x_train, y_train = util.load_dataset(train_path, add_intercept=True)
+
+    # Train a logistic regression classifier
+    clf = LogisticRegression()
+    clf.fit(x_train, y_train)
+
+    # Plot decision boundary on top of validation set set
+    x_eval, y_eval = util.load_dataset(test_path, add_intercept=True)
+    plot_path = output_path_true.replace('.txt', '.png')
+    util.plot(x_eval, y_eval, clf.theta, plot_path)
+
+    # Use np.savetxt to save predictions on eval set to save_path
+    p_eval = clf.predict(x_eval)
+    yhat = p_eval > 0.5
+    print('LR Accuracy: %.2f' % np.mean( (yhat == 1) == (y_eval == 1)))
+    np.savetxt(output_path_true, p_eval)
     # *** END CODE HERE ***
     return full_predictions
 
