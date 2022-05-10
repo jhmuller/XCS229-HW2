@@ -246,7 +246,7 @@ def fully_observed_predictions(train_path, test_path, output_path_true, plot_pat
     # Problem (2a): Train and test on true labels (t)
     # Make sure to save predicted probabilities to output_path_true using np.savetxt()
     # *** START CODE HERE ***
-    x_train, y_train = util.load_dataset(train_path, add_intercept=True)
+    x_train, y_train = util.load_dataset(train_path, label_col='t', add_intercept=True)
 
     # Train a logistic regression classifier
     clf = LogisticRegression()
@@ -262,6 +262,7 @@ def fully_observed_predictions(train_path, test_path, output_path_true, plot_pat
     yhat = p_eval > 0.5
     print('LR Accuracy: %.2f' % np.mean( (yhat == 1) == (y_eval == 1)))
     np.savetxt(output_path_true, p_eval)
+    full_predictions = p_eval
     # *** END CODE HERE ***
     return full_predictions
 
